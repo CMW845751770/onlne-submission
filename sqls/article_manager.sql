@@ -11,7 +11,7 @@
  Target Server Version : 80016
  File Encoding         : 65001
 
- Date: 21/06/2020 11:01:04
+ Date: 26/06/2020 17:36:43
 */
 
 SET NAMES utf8mb4;
@@ -28,7 +28,7 @@ CREATE TABLE `pm_diction`  (
   `gmt_create` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `gmt_modified` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Table structure for pm_file
@@ -71,7 +71,7 @@ CREATE TABLE `pm_msg`  (
   `gmt_create` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `status` int(3) NULL DEFAULT NULL COMMENT '删除状态',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pm_msg
@@ -200,6 +200,7 @@ DROP TABLE IF EXISTS `pm_sub`;
 CREATE TABLE `pm_sub`  (
   `id` int(255) NOT NULL AUTO_INCREMENT,
   `author` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '作者',
+  `author_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '作者(英文)',
   `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '标题',
   `title_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '标题(英文)',
   `summary` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '摘要',
@@ -207,20 +208,21 @@ CREATE TABLE `pm_sub`  (
   `keyword` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '关键词',
   `keyword_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '关键词(英文)',
   `subject` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '学科',
+  `subject_en` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '学科(英文)',
   `username` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '用户名',
   `reviewer` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '审核人',
   `status` int(3) NULL DEFAULT NULL COMMENT '审核状态\r\n     1：待审核\r\n     2：审核中\r\n     3：审核成功\r\n     0：审核失败',
   `gmt_create` datetime(0) NULL DEFAULT NULL COMMENT '添加时间',
   `gmt_modified` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pm_sub
 -- ----------------------------
-INSERT INTO `pm_sub` VALUES (2, '嘤嘤怪', '我不是嘤嘤怪', 'I am not yingyingguai', '我不是嘤嘤怪', 'I am not yingyingguai', '嘤嘤怪', 'yingyingguai', '1', 'admin', NULL, 3, '2020-06-19 14:56:16', '2020-06-20 10:15:44');
-INSERT INTO `pm_sub` VALUES (3, 'cmw天下第一', '改进KNN算法进行fmri数据分类综述', 'A survey of fMRI data classification based on improved KNN algorithm', '使用基于信息熵和Gini指数的改进KNN算法进行MFIR数据的分类', 'Mfir data classification using improved KNN algorithm based on information entropy and Gini index\r\n\r\n', '信息熵，Ginii指数，KNN', 'Information entropy, ginii index, KNN', '0', 'cmw天下第一', NULL, 3, '2020-06-20 10:08:45', '2020-06-20 17:01:38');
-INSERT INTO `pm_sub` VALUES (4, 'cmw天下第一', '标题', 'title', '内容', 'content', '关键字', 'keywords', '2', 'cmw天下第一', NULL, 3, '2020-06-20 17:09:13', '2020-06-20 17:11:03');
+INSERT INTO `pm_sub` VALUES (2, '嘤嘤怪', NULL, '我不是嘤嘤怪', 'I am not yingyingguai', '我不是嘤嘤怪', 'I am not yingyingguai', '嘤嘤怪', 'yingyingguai', '1', NULL, 'admin', NULL, 3, '2020-06-19 14:56:16', '2020-06-20 10:15:44');
+INSERT INTO `pm_sub` VALUES (3, 'cmw天下第一', NULL, '改进KNN算法进行fmri数据分类综述', 'A survey of fMRI data classification based on improved KNN algorithm', '使用基于信息熵和Gini指数的改进KNN算法进行MFIR数据的分类', 'Mfir data classification using improved KNN algorithm based on information entropy and Gini index\r\n\r\n', '信息熵，Ginii指数，KNN', 'Information entropy, ginii index, KNN', '0', NULL, 'cmw天下第一', NULL, 3, '2020-06-20 10:08:45', '2020-06-20 17:01:38');
+INSERT INTO `pm_sub` VALUES (4, 'cmw天下第一', NULL, '标题', 'title', '内容', 'content', '关键字', 'keywords', '2', NULL, 'cmw天下第一', NULL, 3, '2020-06-20 17:09:13', '2020-06-20 17:11:03');
 
 -- ----------------------------
 -- Table structure for pm_sub_file
@@ -233,7 +235,7 @@ CREATE TABLE `pm_sub_file`  (
   `gmt_create` datetime(0) NULL DEFAULT NULL COMMENT '添加时间',
   `gmt_modified` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pm_sub_file
@@ -258,15 +260,16 @@ CREATE TABLE `pm_user`  (
   `gmt_modified` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_unique_username`(`username`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 34 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pm_user
 -- ----------------------------
 INSERT INTO `pm_user` VALUES (1, 'admin', '$2a$10$vyVd27QuLihbJxpm9GB0Tu.HbYKNC4JuztKA8NAnwMZW1wijWVQZy', 'admin', 'admin@test.com', 1, 1, '2019-04-10 14:16:27', '2019-04-10 21:22:33');
-INSERT INTO `pm_user` VALUES (5, 'cmw天下第一', '$2a$10$qRomB27FuskpXW0y01zB3.FqbDP8eO.9GlTWeicWhQhFRIed75ISa', 'cmw天下第一', '845751770@qq.com', 1, NULL, '2020-06-19 15:20:54', '2020-06-19 22:37:01');
+INSERT INTO `pm_user` VALUES (5, 'cmw天下第一', '$2a$10$rbgiwlCjT6iPFN4Dgkx0qeH8ZrhDM11pUvSHaZxYA4I1GyIp8Wpfi', 'cmw天下第一', '845751770@qq.com', 1, NULL, '2020-06-19 15:20:54', '2020-06-26 17:19:56');
 INSERT INTO `pm_user` VALUES (28, 'admin123', '$2a$10$May8cijT4k/WhKZaymIlUea0nzHrx0IMOcMB8LAYORcFyAw//Yjma', NULL, NULL, 1, NULL, '2020-06-20 12:14:34', '2020-06-20 12:14:34');
 INSERT INTO `pm_user` VALUES (32, 'rbc777', '$2a$10$eshJq1IvPJ8d.CL4oFAh2O19S0a5EecGRcBamlA0P3MXrkezCjDQK', 'rbc777', '123@163.com', 1, NULL, '2020-06-21 10:57:55', '2020-06-21 10:57:55');
+INSERT INTO `pm_user` VALUES (33, 'haoran', '$2a$10$O02MtW2GzPrEH695M5Wm2.CrQD5MC2jorLyzReGg4/SfsVR7Qizx2', NULL, NULL, 1, NULL, '2020-06-22 18:54:52', '2020-06-22 18:54:52');
 
 -- ----------------------------
 -- Table structure for pm_user_role
@@ -279,7 +282,7 @@ CREATE TABLE `pm_user_role`  (
   `gmt_create` datetime(0) NULL DEFAULT NULL COMMENT '创建时间',
   `gmt_modified` datetime(0) NULL DEFAULT NULL COMMENT '修改时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 19 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pm_user_role
@@ -299,6 +302,7 @@ INSERT INTO `pm_user_role` VALUES (13, 3, 25, '2020-06-20 11:52:36', '2020-06-20
 INSERT INTO `pm_user_role` VALUES (15, 3, 27, '2020-06-20 12:12:31', '2020-06-20 12:12:31');
 INSERT INTO `pm_user_role` VALUES (16, 3, 28, '2020-06-20 12:14:34', '2020-06-20 12:14:34');
 INSERT INTO `pm_user_role` VALUES (17, 2, 32, '2020-06-21 10:57:55', '2020-06-21 10:57:55');
+INSERT INTO `pm_user_role` VALUES (18, 3, 33, '2020-06-22 18:54:52', '2020-06-22 18:54:52');
 
 -- ----------------------------
 -- Table structure for pm_userdata
@@ -320,7 +324,7 @@ CREATE TABLE `pm_userdata`  (
   `address` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '通信地址',
   `zipcode` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL DEFAULT NULL COMMENT '邮编',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
+) ENGINE = InnoDB AUTO_INCREMENT = 6 CHARACTER SET = utf8 COLLATE = utf8_general_ci ROW_FORMAT = Compact;
 
 -- ----------------------------
 -- Records of pm_userdata
@@ -328,6 +332,7 @@ CREATE TABLE `pm_userdata`  (
 INSERT INTO `pm_userdata` VALUES (1, 'admin', 'admin', 1, '18652250365', '2392900639@163.com', '天津大学', '本科', '理学士', '2020-06-19 20:53:32', '2020-06-19 22:42:32', 1, '天津大学', '362701');
 INSERT INTO `pm_userdata` VALUES (2, 'cmw天下第一', 'cmw', 1, '18856325422', '2392900639@Google.com', '天津大学', '本科', '工学士', '2020-06-19 22:38:25', '2020-06-19 22:38:27', 1, '天津大学', '365200');
 INSERT INTO `pm_userdata` VALUES (4, 'admin123', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2020-06-20 12:14:35', '2020-06-20 12:14:35', 1, NULL, NULL);
-INSERT INTO `pm_userdata` VALUES (5, 'rbc777', 'rbc777', NULL, NULL, '123@163.com', NULL, NULL, NULL, '2020-06-21 10:57:55', '2020-06-21 10:57:55', 1, NULL, NULL);
+INSERT INTO `pm_userdata` VALUES (5, 'rbc777', 'rbc777', NULL, NULL, '123@163.com', NULL, NULL, NULL, '2020-06-21 10:57:55', '2020-06-26 16:54:04', 1, NULL, NULL);
+INSERT INTO `pm_userdata` VALUES (6, 'haoran', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '2020-06-22 18:54:53', '2020-06-22 18:54:53', 1, NULL, NULL);
 
 SET FOREIGN_KEY_CHECKS = 1;
