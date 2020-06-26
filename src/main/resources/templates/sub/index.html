@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body class="">
+<div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a>
+          <cite>稿件列表</cite></a>
+      </span>
+
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <input class="layui-input" placeholder="作者" name="author">
+            <input class="layui-input" placeholder="投稿者" name="username">
+            <input class="layui-input" placeholder="标题" name="title">
+            <input class="layui-input" placeholder="摘要" name="summary">
+            <br/>
+            <input class="layui-input" placeholder="关键字" name="keyword">
+
+            <div class="layui-input-inline">
+                <select lay-verify="" id="subject" name="subject">
+                    <option value="">学科</option>
+                    <option value="0">计算机科学与技术</option>
+                    <option value="1">机电工程</option>
+                    <option value="2">物理工程</option>
+                </select>
+            </div>
+            <div class="layui-input-inline">
+                <select name="type">
+                    <option value="">类型</option>
+                    <option value="0">目录</option>
+                    <option value="1">菜单</option>
+                    <option value="2">按钮</option>
+                    <option value="3">接口</option>
+                </select>
+            </div>
+            <br/>
+            <div class="layui-input-inline">
+                <select name="status">
+                    <option value="">审核状态</option>
+                    <option value="1">待审核</option>
+                    <option value="2">审核中</option>
+                    <option value="3">审核成功</option>
+                    <option value="0">审核失败</option>
+                </select>
+            </div>
+            <input class="layui-input" autocomplete="off" placeholder="创建时间" name="gmtCreate" id="start">
+            <input class="layui-input" autocomplete="off" placeholder="修改时间" name="gmtModified" id="end">
+            <button class="layui-btn" lay-submit="" lay-filter="search" th:title="搜索"><i class="layui-icon">&#xe615;</i>
+            </button>
+            <button class="layui-btn" type="reset" lay-event="clear" th:title="重置"><i
+                    class="layui-icon layui-icon-fonts-clear"></i></button>
+        </form>
+    </div>
+    <table class="layui-table"
+           lay-data="{url:'./list',page:true,toolbar: '#toolbarDemo',id:'tsub',initSort:{field:'status', type:'asc'}}"
+           lay-filter="tsub">
+        <thead>
+        <tr>
+            <th lay-data="{type:'checkbox'}">ID</th>
+            <th lay-data="{field:'id',sort: true, width:50}">ID</th>
+            <th lay-data="{field:'author', width:100, sort: true, edit: 'text'}">作者</th>
+            <th lay-data="{field:'title', width:100, sort: true, edit: 'text',event: 'setTitle'}">标题</th>
+            <th lay-data="{field:'summary', sort: true, width: 100,event: 'setSummary'}">摘要</th>
+            <th lay-data="{field:'keyword', sort: true, width: 100,event: 'setKeyword'}">关键字</th>
+            <th lay-data="{field:'subject', sort: true, width: 100}">学科</th>
+            <th lay-data="{field:'username', sort: true, width: 100}">投稿者</th>
+            <th lay-data="{field:'status', width: 100, sort: true, templet: '#setStatus',event: 'setStatus'}">状态</th>
+            <th lay-data="{field:'right', width: 150, align:'center', toolbar: '#barDemo'}">操作</th>
+        </tr>
+        </thead>
+    </table>
+
+</div>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="toAdd">添加稿件</button>
+        <button class="layui-btn layui-btn-sm" lay-event="toEdit">编辑稿件</button>
+        <button class="layui-btn layui-btn-sm" lay-event="deleteSelect">删除稿件</button>
+    </div>
+</script>
+<script type="text/html" id="setStatus">
+    {{# if(d.status==1){ }} <span id="{{d.id}}_status" style="color: #FFB800;">待审核</span>{{# } }}
+    {{# if(d.status==2){ }} <span id="{{d.id}}_status" style="color: blue;">审核中</span>{{# } }}
+    {{# if(d.status==3){ }} <span id="{{d.id}}_status" style="color: green;">审核成功</span>{{# } }}
+    {{# if(d.status==0){ }} <span id="{{d.id}}_status" style="color: red;">审核失败</span>{{# } }}
+</script>
+<script type="text/html" id="barDemo">
+    <a class="layui-btn layui-btn-xs" lay-event="detail">查看</a>
+    <a class="layui-btn layui-btn-xs review" lay-event="review">审核</a>
+</script>
+<script>
+    layui.use('table', function () {
+        $ = layui.jquery;
+        var table = layui.table;
+        var form = layui.form
+            , layer = layui.layer;
+
+        form.on('submit(search)', function (data) {
+            var obj = data.field;
+            console.log(obj);
+            // 异步提交表单
+            table.reload('tsub', {
+                url: '/admin/sub/list',
+                where: obj
+            });
+            return false;
+        });
+        table.on('checkbox(tsub)', function (obj) {
+            console.log(obj.checked); //当前是否选中状态
+            console.log(obj.data); //选中行的相关数据
+            console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
+        });
+
+        //监听行工具事件
+        table.on('tool(tsub)', function(obj){ //注：tool 是工具条事件名，test 是 table 原始容器的属性 lay-filter="对应的值"
+            var data = obj.data //获得当前行数据
+                ,layEvent = obj.event; //获得 lay-event 对应的值
+            let dstatus = $("#"+data.id+"_status");
+            if(layEvent === 'detail'){
+                x_admin_show('查看', '/admin/sub/detail/'+data.id,700);
+            }else if(layEvent === 'review'){
+                console.log(obj);
+                if(data.status === 1){//只有在待审核状态才可以审核
+                    dstatus.css("color","blue").html("审核中");
+                    setReview(data.id,2);
+                }else if(data.status === 2 ){
+                    layer.prompt({
+                        formType: 2,
+                        value: '审核原因',
+                        title: '请输入审核原因',
+                        btn: ['审核通过','审核失败','取消'],
+                        yes: function(index, layero){
+                            //按钮【按钮一】的回调
+                            let msg = $("textarea.layui-layer-input").val();
+                            dstatus.css("color","green").html("审核成功");
+                            setReview(data.id,3,msg);
+                            layer.close(index);
+                            return false;
+                        }
+                        ,btn2: function(index, layero){
+                            let msg = $("textarea.layui-layer-input").val();
+                            dstatus.css("color","red").html("审核失败");
+                            setReview(data.id,0,msg);
+                            layer.close(index);
+                            return false;
+                        }
+                    }, function(value, index, elem){
+                        layer.close(index);
+                    });
+                }else{
+                    layer.msg("审核已完成");
+                }
+            }
+            if (obj.event === 'setSummary') {
+                setValue(data.id,"摘要", data.summary,"summary",obj);
+            }else if (obj.event === 'setKeyword') {
+                setValue(data.id,"关键字", data.keyword,"keyword",obj);
+            }else if (obj.event === 'setTitle') {
+                setValue(data.id,"标题", data.title,"title",obj);
+            }
+        });
+        function setReview(id,value,msg){
+            $.ajax({
+                type: 'POST',
+                url: '/admin/sub/opt/' + id,
+                data: {id:id,status:value,msg:msg},
+                success: function (data) {
+                    if (data.code == 0) {
+                        layer.alert("审核完成", {icon: d.code + 1}, function () {
+                            // 获得frame索引
+                            var index = parent.layer.getFrameIndex(window.name);
+                            //关闭当前frame
+                            parent.layer.close(index);
+                        });
+                    }
+                }
+            });
+        }
+
+        function setValue(id,name, value,key,obj) {
+            layer.prompt({
+                formType: 2
+                , title: '修改 ID 为 [' + id + '] 的' + name
+                , value: value
+            }, function (value, index) {
+                layer.close(index);
+                //这里一般是发送修改的Ajax请求
+                let jvalue = {};
+                jvalue[key]=value;
+                obj.update(jvalue);
+                jvalue["id"]=id;
+                console.log(jvalue);
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/sub/opt/' + id,
+                    data: jvalue,
+                    success: function (data) {
+                        if (data.code == 0) {
+                            layer.msg('修改成功');
+                        }
+                    }
+                });
+            });
+        }
+
+        //监听单元格编辑
+        table.on('edit(tsub)', function (obj) {
+            var value = obj.value //得到修改后的值
+                , data = obj.data //得到所在行所有键值
+                , field = obj.field; //得到字段
+
+            var obj = {};
+            k = field;
+            v = value;
+            obj[k] = v.trim().replace(" ", "_"); //相当于obj['name'] = 'shilei';
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/sub/opt/' + data.id,
+                data: obj,
+                success: function (data) {
+                    if (data.code == 0) {
+                        layer.msg('修改成功');
+                    }
+                }
+            });
+            // layer.msg('[ID: ' + data.id + '] ' + field + ' 字段更改为：' + value);
+        });
+
+        //头工具栏事件
+        table.on('toolbar(tsub)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'deleteSelect':
+                    var data = checkStatus.data;
+                    layer.confirm("确定要删除这 " + data.length + " 项吗？", function (index) {
+                        var ids = [];
+                        for (let a in data) {
+                            ids.push(data[a].id);
+                        }
+                        console.log(ids);
+                        $.ajax({
+                            type: 'DELETE',
+                            url: '/admin/sub/opt',
+                            data: JSON.stringify(ids),
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            dataType: 'JSON',
+                            success: function (data) {
+                                layer.msg(data.message);
+                                table.reload('tsub', {
+                                    url: '/admin/sub/list'
+                                });
+                            }
+                        });
+                    });
+                    break;
+                case 'toAdd':
+                    x_admin_show('添加', '/admin/sub/put',700);
+                    break;
+                case 'toEdit':
+                    var data = checkStatus.data;
+                    if (data.length != 1) {
+                        layer.msg('必须选择一条数据进行编辑！');
+                    } else {
+                        x_admin_show('编辑', '/admin/sub/opt/toEdit/' + data[0].id,700);
+                    }
+                    break;
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

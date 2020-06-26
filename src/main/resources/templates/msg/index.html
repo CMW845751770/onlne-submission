@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body class="">
+<div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a>
+          <cite>回复列表</cite></a>
+      </span>
+
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <input class="layui-input" placeholder="回复内容" name="msg">
+            <div class="layui-input-inline">
+                <select name="type">
+                    <option value="">通知类型</option>
+                    <option value="1">回复</option>
+                    <option value="2">消息</option>
+                    <option value="3">全局</option>
+                </select>
+            </div>
+            <input class="layui-input" placeholder="发送者" name="msg">
+            <input class="layui-input" placeholder="接收者" name="msg">
+            <input class="layui-input" autocomplete="off" placeholder="回复时间" name="gmtCreate" id="start">
+
+            <button class="layui-btn" lay-submit="" lay-filter="search" th:title="搜索"><i class="layui-icon">&#xe615;</i>
+            </button>
+            <button class="layui-btn" type="reset" lay-event="clear" th:title="重置"><i
+                    class="layui-icon layui-icon-fonts-clear"></i></button>
+        </form>
+    </div>
+    <table class="layui-table"
+           lay-data="{url:'./list',page:true,toolbar: '#toolbarDemo',id:'tmsg',initSort:{field:'status', type:'asc'}}"
+           lay-filter="tmsg">
+        <thead>
+        <tr>
+            <th lay-data="{type:'checkbox'}">ID</th>
+            <th lay-data="{field:'id',sort: true, width:50}">ID</th>
+            <th lay-data="{field:'msg', width:100, sort: true, edit: 'text',event: 'setMsg'}">通知信息</th>
+            <th lay-data="{field:'type', width:100, sort: true, edit: 'text'}">通知类型</th>
+            <th lay-data="{field:'userSender',  width: 150}">发送者</th>
+            <th lay-data="{field:'userReceer', edit: 'text', width: 150}">接收者</th>
+            <th lay-data="{field:'sid', width: 100, sort: true}">稿件ID</th>
+            <th lay-data="{field:'isRead', width: 100, sort: true}">是否已读</th>
+            <th lay-data="{field:'gmtCreate', width: 200, sort: true,templet: '#createTpl'}">回复时间</th>
+        </tr>
+        </thead>
+    </table>
+
+</div>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="toAdd">添加回复</button>
+        <button class="layui-btn layui-btn-sm" lay-event="toEdit">编辑回复</button>
+        <button class="layui-btn layui-btn-sm" lay-event="deleteSelect">删除回复</button>
+    </div>
+</script>
+<script type="text/html" id="createTpl">
+    {{#
+    layui.use('util',function(){
+    var util = layui.util;
+    }}
+    {{ util.toDateString(d.gmtCreate, 'yyyy-MM-dd HH:mm:ss')}}
+    {{#  });  }}
+</script>
+<script>
+
+    layui.use('laydate', function () {
+        var laydate = layui.laydate;
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+            , type: 'datetime'
+            , range: true
+            , format: 'yyyy-MM-dd HH:mm:ss' //可任意组合
+        });
+    });
+</script>
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+        var form = layui.form
+            , layer = layui.layer;
+
+        form.on('submit(search)', function (data) {
+            var obj = data.field;
+            console.log(obj);
+            // 异步提交表单
+            table.reload('tmsg', {
+                url: '/admin/msg/list',
+                where: obj
+            });
+            return false;
+        });
+        table.on('checkbox(tmsg)', function(obj){
+            console.log(obj.checked); //当前是否选中状态
+            console.log(obj.data); //选中行的相关数据
+            console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
+        });
+
+        //监听描述点击事件
+        table.on('tool(tmsg)', function (obj) {
+            var data = obj.data;
+            console.log(data);
+            if (obj.event === 'setMsg') {
+                layer.prompt({
+                    formType: 2
+                    , title: '修改 ID 为 [' + data.id + '] 的回复内容'
+                    , value: data.msg
+                }, function (value, index) {
+                    layer.close(index);
+                    //这里一般是发送修改的Ajax请求
+                    $.ajax({
+                        type: 'PUT',
+                        url: '/admin/msg/opt/' + data.id,
+                        data: {msg: value},
+                        success: function (data) {
+                            if (data.code == 0) {
+                                layer.msg('修改成功');
+                            }
+                        }
+                    });
+                    //同步更新表格和缓存对应的值
+                    obj.update({
+                        msg: value
+                    });
+                });
+            }
+        });
+        //监听单元格编辑
+        table.on('edit(tmsg)', function (obj) {
+            var value = obj.value //得到修改后的值
+                , data = obj.data //得到所在行所有键值
+                , field = obj.field; //得到字段
+
+            var obj = {};
+            k = field;
+            v = value;
+            obj[k] = v.trim().replace(" ", "_"); //相当于obj['name'] = 'shilei';
+
+            $.ajax({
+                type: 'PUT',
+                url: '/admin/msg/opt/' + data.id,
+                data: obj,
+                success: function (data) {
+                    if (data.code == 0) {
+                        layer.msg('修改成功');
+                    }
+                }
+            });
+            // layer.msg('[ID: ' + data.id + '] ' + field + ' 字段更改为：' + value);
+        });
+
+        //头工具栏事件
+        table.on('toolbar(tmsg)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'deleteSelect':
+                    var data = checkStatus.data;
+                    layer.confirm("确定要删除这 " + data.length + " 项吗？", function (index) {
+                        var ids = [];
+                        for (let a in data) {
+                            ids.push(data[a].id);
+                        }
+                        console.log(ids);
+                        $.ajax({
+                            type: 'DELETE',
+                            url: '/admin/msg/opt',
+                            data: JSON.stringify(ids),
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            dataType: 'JSON',
+                            success: function (data) {
+                                layer.msg(data.message);
+                                table.reload('tmsg', {
+                                    url: '/admin/msg/list'
+                                });
+                            }
+                        });
+                    });
+                    break;
+                case 'toAdd':
+                    x_admin_show('添加', '/admin/msg/opt/toAdd');
+                    break;
+                case 'toEdit':
+                    // layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                    var data = checkStatus.data;
+                    if (data.length != 1) {
+                        layer.msg('必须选择一条数据进行编辑！');
+                    } else {
+                        x_admin_show('编辑', '/admin/msg/opt/toEdit/' + data[0].id);
+                    }
+                    break;
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

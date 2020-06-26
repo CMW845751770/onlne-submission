@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.tju.mapper.UserdataMapper">
+
+    <update id="updateSelective">
+        update pm_userdata set realname = #{realname} ,
+        sex = #{sex},phone = #{phone} , email = #{email} ,
+        graduation_school = #{graduationSchool} ,
+        education = #{education} .
+        degree = #{degree} ,gmt_modified = #{gmtModified} ,
+        address = #{address} , zipcode = #{zipcode} where id = #{id}
+    </update>
+</mapper>

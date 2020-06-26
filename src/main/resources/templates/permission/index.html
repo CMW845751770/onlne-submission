@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body class="">
+<div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a>
+          <cite>权限列表</cite></a>
+      </span>
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <input class="layui-input" placeholder="权限名" name="name">
+            <input type="text" name="url" placeholder="匹配地址" class="layui-input">
+            <div class="layui-input-inline">
+                <select name="type">
+                    <option value="">类型</option>
+                    <option value="0">目录</option>
+                    <option value="1">菜单</option>
+                    <option value="2">按钮</option>
+                    <option value="3">接口</option>
+                </select>
+            </div>
+            <input class="layui-input" autocomplete="off" placeholder="创建时间" name="gmtCreate" id="start">
+            <input class="layui-input" autocomplete="off" placeholder="修改时间" name="gmtModified" id="end">
+            <button class="layui-btn" lay-submit="" lay-filter="search" th:title="搜索"><i class="layui-icon">&#xe615;</i></button>
+            <button class="layui-btn" type="reset" lay-filter="clear" th:title="重置"><i class="layui-icon layui-icon-fonts-clear"></i></button>
+        </form>
+    </div>
+    <table class="layui-table" lay-data="{url:'./list',page:true,toolbar: '#toolbarDemo',id:'test'}" lay-filter="test">
+        <thead>
+        <tr>
+            <th lay-data="{type:'checkbox'}">ID</th>
+            <th lay-data="{field:'id', sort: true, width:50}">ID</th>
+            <th lay-data="{field:'name', width:100, sort: true, edit: 'text'}">权限名</th>
+            <th lay-data="{field:'pid', sort: true, edit: 'text', width: 80}">上级权限</th>
+            <th lay-data="{field:'url', edit: 'text', width: 150}">地址</th>
+            <th lay-data="{field:'type', sort: true, width:60,templet: '#setType'}">类型</th>
+            <th lay-data="{field:'icon', sort: true, edit: 'text',width:150}">图标</th>
+            <th lay-data="{field:'seq', sort: true, edit: 'text',width:90}">顺序</th>
+            <th lay-data="{field:'permCode', sort: true, edit: 'text',width:150}">权限编码</th>
+            <th lay-data="{field:'description', sort: true, edit: 'text',event: 'setDesc'}">描述</th>
+            <th lay-data="{field:'gmtCreate', sort: true, width:150,templet: '#createTpl'}">创建时间</th>
+            <th lay-data="{field:'gmtModified', sort: true,width:150,templet: '#modifiedTpl'}">修改时间</th>
+        </tr>
+        </thead>
+    </table>
+
+</div>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="toAdd">添加权限</button>
+        <button class="layui-btn layui-btn-sm" lay-event="toEdit">编辑权限</button>
+        <button class="layui-btn layui-btn-sm" lay-event="deleteSelect">删除数据</button>
+    </div>
+</script>
+<script type="text/html" id="setType">
+    {{# if(d.type==0){ }} 目录{{# } }}
+    {{# if(d.type==1){ }} 菜单{{# } }}
+    {{# if(d.type==2){ }} 按钮{{# } }}
+    {{# if(d.type==3){ }} 接口{{# } }}
+</script>
+<script type="text/html" id="createTpl">
+    {{#
+    layui.use('util',function(){
+    var util = layui.util;
+    }}
+    {{ util.toDateString(d.gmtCreate, 'yyyy-MM-dd HH:mm:ss')}}
+    {{#  });  }}
+</script>
+<script type="text/html" id="modifiedTpl">
+    {{#
+    layui.use('util',function(){
+    var util = layui.util;
+    }}
+    {{ util.toDateString(d.gmtModified, 'yyyy-MM-dd HH:mm:ss')}}
+    {{#  });  }}
+</script>
+<script>
+
+    layui.use('laydate', function () {
+        var laydate = layui.laydate;
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#start' //指定元素
+            , type: 'datetime'
+            , range: true
+            , format: 'yyyy-MM-dd HH:mm:ss' //可任意组合
+        });
+
+        //执行一个laydate实例
+        laydate.render({
+            elem: '#end' //指定元素
+            , type: 'datetime'
+            , range: true
+            , format: 'yyyy-MM-dd HH:mm:ss' //可任意组合
+        });
+
+
+    });
+</script>
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+        var form = layui.form
+            , layer = layui.layer;
+
+        //监听搜索条件事件
+        form.on('submit(search)', function (data) {
+            var obj = data.field;
+            console.log(obj);
+            // 异步提交表单
+            table.reload('test', {
+                url: '/admin/permission/list',
+                where: obj
+            });
+            return false;
+        });
+        //监听搜索条件事件
+        form.on('submit(clear)', function (data) {
+            // 异步提交表单
+            table.reload('test', {
+                url: '/admin/permission/list',
+            });
+            return false;
+        });
+        //监听单元格编辑
+        table.on('edit(test)', function (obj) {
+            var value = obj.value //得到修改后的值
+                , data = obj.data //得到所在行所有键值
+                , field = obj.field; //得到字段
+
+            var obj = {};
+            k = field;
+            v = value;
+            obj[k] = v.trim().replace(" ","_"); //相当于obj['name'] = 'shilei';
+
+            $.ajax({
+                type: 'PUT',
+                url: '/admin/permission/opt/' + data.id,
+                data: obj,
+                success: function (data) {
+                    if (data.code == 0) {
+                        layer.msg('修改成功');
+                    }
+                }
+            });
+        });
+        //监听描述点击事件
+        table.on('tool(test)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'setDesc') {
+                layer.prompt({
+                    formType: 2
+                    , title: '修改 ID 为 [' + data.id + '] 的描述'
+                    , value: data.description
+                }, function (value, index) {
+                    layer.close(index);
+                    //这里一般是发送修改的Ajax请求
+                    $.ajax({
+                        type: 'PUT',
+                        url: '/admin/permission/opt/' + data.id,
+                        data: {description: value},
+                        success: function (data) {
+                            if (data.code == 0) {
+                                layer.msg('修改成功');
+                            }
+                        }
+                    });
+                    //同步更新表格和缓存对应的值
+                    obj.update({
+                        description: value
+                    });
+                });
+            }
+        });
+
+        //头工具栏事件
+        table.on('toolbar(test)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'deleteSelect':
+                    var data = checkStatus.data;
+                    layer.confirm("确定要删除这 " + data.length + " 项吗？", function (index) {
+                        var ids = [];
+                        for (let a in data) {
+                            ids.push(data[a].id);
+                        }
+                        console.log(ids);
+                        $.ajax({
+                            type: 'DELETE',
+                            url: '/admin/permission/opt',
+                            data: JSON.stringify(ids),
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            dataType: 'JSON',
+                            success: function (data) {
+                                layer.msg(data.message);
+                                table.reload('test', {
+                                    url: '/admin/permission/list'
+                                });
+                            }
+                        });
+                    });
+                    break;
+                case 'toAdd':
+                    x_admin_show('添加', '/admin/permission/opt/toAdd',700);
+                    break;
+                case 'toEdit':
+                    // layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                    var data = checkStatus.data;
+                    if (data.length != 1) {
+                        layer.msg('必须选择一条数据进行编辑！');
+                    } else {
+                        x_admin_show('编辑', '/admin/permission/opt/toEdit/' + data[0].id,700);
+                    }
+                    break;
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

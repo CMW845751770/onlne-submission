@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body class="">
+<div class="x-nav">
+      <span class="layui-breadcrumb">
+        <a href="">首页</a>
+        <a>
+          <cite>角色列表</cite></a>
+      </span>
+
+    <a class="layui-btn layui-btn-small" style="line-height:1.6em;margin-top:3px;float:right"
+       href="javascript:location.replace(location.href);" title="刷新">
+        <i class="layui-icon" style="line-height:30px">ဂ</i></a>
+</div>
+<div class="x-body">
+    <div class="layui-row">
+        <form class="layui-form layui-col-md12 x-so">
+            <input class="layui-input" placeholder="角色名" name="name">
+            <input type="text" name="code" placeholder="角色编码" class="layui-input">
+            <div class="layui-input-inline">
+                <select name="status">
+                    <option value="">状态</option>
+                    <option value="1">启用</option>
+                    <option value="2">禁用</option>
+                </select>
+            </div>
+            <button class="layui-btn" lay-submit="" lay-filter="search" th:title="搜索"><i class="layui-icon">&#xe615;</i>
+            </button>
+            <button class="layui-btn" type="reset" lay-event="clear" th:title="重置"><i
+                    class="layui-icon layui-icon-fonts-clear"></i></button>
+        </form>
+    </div>
+    <table class="layui-table"
+           lay-data="{url:'./list',page:true,toolbar: '#toolbarDemo',id:'trole',initSort:{field:'status', type:'asc'}}"
+           lay-filter="trole">
+        <thead>
+        <tr>
+            <th lay-data="{type:'checkbox'}">ID</th>
+            <th lay-data="{field:'id',sort: true, width:50}">ID</th>
+            <th lay-data="{field:'name', width:100, sort: true, edit: 'text'}">角色名</th>
+            <th lay-data="{field:'code', width:100, sort: true, edit: 'text'}">角色编码</th>
+            <th lay-data="{field:'pers',  width: 250}">拥有权限</th>
+            <th lay-data="{field:'description', edit: 'text', width: 200,event: 'setDesc'}">描述</th>
+            <th lay-data="{field:'status', width: 100, sort: true, templet: '#switchStatus',event: 'setStatus'}">状态</th>
+        </tr>
+        </thead>
+    </table>
+
+</div>
+<script type="text/html" id="toolbarDemo">
+    <div class="layui-btn-container">
+        <button class="layui-btn layui-btn-sm" lay-event="toAdd">添加角色</button>
+        <button class="layui-btn layui-btn-sm" lay-event="toEdit">编辑角色</button>
+        <button class="layui-btn layui-btn-sm" lay-event="deleteSelect">删除角色</button>
+    </div>
+</script>
+<script type="text/html" id="switchStatus">
+    <input id="{{d.id}}_status" type="checkbox" name="status" value="{{d.status}}" lay-skin="switch" lay-text="启用|禁用" {{
+           d.status== 1 ?'checked' : '' }}>
+</script>
+<script>
+    layui.use('table', function () {
+        var table = layui.table;
+        var form = layui.form
+            , layer = layui.layer;
+
+        form.on('submit(search)', function (data) {
+            var obj = data.field;
+            console.log(obj);
+            // 异步提交表单
+            table.reload('trole', {
+                url: '/admin/role/list',
+                where: obj
+            });
+            return false;
+        });
+        table.on('checkbox(trole)', function(obj){
+            console.log(obj.checked); //当前是否选中状态
+            console.log(obj.data); //选中行的相关数据
+            console.log(obj.type); //如果触发的是全选，则为：all，如果触发的是单选，则为：one
+        });
+
+        //监听描述点击事件
+        table.on('tool(trole)', function (obj) {
+            var data = obj.data;
+            if (obj.event === 'setDesc') {
+                layer.prompt({
+                    formType: 2
+                    , title: '修改 ID 为 [' + data.id + '] 的描述'
+                    , value: data.description
+                }, function (value, index) {
+                    layer.close(index);
+                    //这里一般是发送修改的Ajax请求
+                    $.ajax({
+                        type: 'POST',
+                        url: '/admin/role/opt/' + data.id,
+                        data: {description: value},
+                        success: function (data) {
+                            if (data.code == 0) {
+                                layer.msg('修改成功');
+                            }
+                        }
+                    });
+                    //同步更新表格和缓存对应的值
+                    obj.update({
+                        description: value
+                    });
+                });
+            }else if (obj.event === 'setStatus') {
+                let status = $("#" + data.id + "_status");
+                let cur = status.val();
+                let s = cur == '1' ? '2' : '1';
+                console.log();
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/role/opt/' + data.id,
+                    data: {status: s},
+                    success: function (d) {
+                        if(d.code==1){
+                            layer.msg("修改失败！");
+                        }
+                        console.log('修改 ID [' + data.id + '] 的状态 [' + cur + '] 改为：' + s);
+                    }
+                });
+                //同步更新表格和缓存对应的值
+                status.val(s);
+            }
+        });
+        //监听单元格编辑
+        table.on('edit(trole)', function (obj) {
+            var value = obj.value //得到修改后的值
+                , data = obj.data //得到所在行所有键值
+                , field = obj.field; //得到字段
+
+            var obj = {};
+            k = field;
+            v = value;
+            obj[k] = v.trim().replace(" ", "_"); //相当于obj['name'] = 'shilei';
+
+            $.ajax({
+                type: 'POST',
+                url: '/admin/role/opt/' + data.id,
+                data: obj,
+                success: function (data) {
+                    if (data.code == 0) {
+                        layer.msg('修改成功');
+                    }
+                }
+            });
+            // layer.msg('[ID: ' + data.id + '] ' + field + ' 字段更改为：' + value);
+        });
+
+        //头工具栏事件
+        table.on('toolbar(trole)', function (obj) {
+            var checkStatus = table.checkStatus(obj.config.id);
+            switch (obj.event) {
+                case 'deleteSelect':
+                    var data = checkStatus.data;
+                    layer.confirm("确定要删除这 " + data.length + " 项吗？", function (index) {
+                        var ids = [];
+                        for (let a in data) {
+                            ids.push(data[a].id);
+                        }
+                        console.log(ids);
+                        $.ajax({
+                            type: 'DELETE',
+                            url: '/admin/role/opt',
+                            data: JSON.stringify(ids),
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            dataType: 'JSON',
+                            success: function (data) {
+                                layer.msg(data.message);
+                                table.reload('trole', {
+                                    url: '/admin/role/list'
+                                });
+                            }
+                        });
+                    });
+                    break;
+                case 'toAdd':
+                    x_admin_show('添加', '/admin/role/opt/toAdd');
+                    break;
+                case 'toEdit':
+                    // layer.msg(checkStatus.isAll ? '全选' : '未全选');
+                    var data = checkStatus.data;
+                    if (data.length != 1) {
+                        layer.msg('必须选择一条数据进行编辑！');
+                    } else {
+                        x_admin_show('编辑', '/admin/role/opt/toEdit/' + data[0].id);
+                    }
+                    break;
+            }
+        });
+    });
+</script>
+</body>
+
+</html>

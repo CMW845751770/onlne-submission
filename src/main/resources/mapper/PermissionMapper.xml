@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.edu.tju.mapper.PermissionMapper">
+    <cache/>
+    <select id="findByUserId" resultType="cn.edu.tju.entity.Permission">
+        select * from pm_permission where id in
+        (select pid from pm_role_permission where rid in
+        (select rid from pm_user_role where uid=#{id}))
+    </select>
+    <select id="selectByUrl" resultType="cn.edu.tju.entity.Permission">
+        select * from pm_permission where url like '%${value}%'
+    </select>
+    <select id="findByUsername" resultType="cn.edu.tju.entity.Permission">
+        select * from pm_permission
+    </select>
+    <select id="findByAuths" parameterType="string" resultType="cn.edu.tju.entity.Permission">
+        select * from pm_permission
+         <where>
+            <foreach collection="list" item="item" open="perm_code IN (" close=")" separator=",">
+                #{item}
+            </foreach>
+            and type = 1
+         </where>
+          order by seq asc
+    </select>
+</mapper>

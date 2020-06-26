@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    <form action="" method="post" class="layui-form layui-form-pane" id="roleForm">
+        <div class="layui-form-item">
+            <label for="name" class="layui-form-label">
+                <span class="x-red">*</span>角色名
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="name" name="name" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="code" class="layui-form-label">
+                <span class="x-red">*</span>角色编码
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="code" name="code" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label class="layui-form-label">
+                拥有权限
+            </label>
+            <table class="layui-table layui-input-block">
+                <tbody>
+                <tr th:each="item,property : ${pers}" th:if="${item.pid==0}">
+                    <td>
+                        <input type="checkbox" name="pids" lay-skin="primary" lay-filter="father"
+                               th:value="${item.id}" th:title="${item.name}">
+                    </td>
+                    <td>
+                        <div class="layui-input-block">
+                            <span th:each="i,p : ${pers}" th:if="${item.id==i.pid}">
+                                <input name="pids" lay-skin="primary"
+                                       type="checkbox" th:value="${i.id}" th:title="${i.name}">
+                                <input th:each="ii,pp : ${pers}" th:if="${i.id==ii.pid}" name="pids"
+                                       lay-skin="primary"
+                                       type="checkbox" th:value="${ii.id}" th:title="${ii.name}">
+                            </span>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="layui-form-item layui-form-text">
+            <label for="description" class="layui-form-label">
+                描述
+            </label>
+            <div class="layui-input-block">
+                <textarea placeholder="请输入内容" id="description" name="description" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <button class="layui-btn" lay-submit="" lay-filter="add">增加</button>
+        </div>
+    </form>
+</div>
+<script>
+
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if(this.name=="pids"){
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = [this.value || ''];
+                }
+            }else if (o[this.name] !== undefined) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+    layui.use(['form', 'layer'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer;
+        //监听提交
+        form.on('submit(add)', function (data) {
+            var obj = data.field;
+            var f = $('#roleForm').serializeObject();
+            console.log(f);
+            console.log(obj);
+            // 异步提交表单
+            $.ajax({
+                type: 'POST',
+                url: '/admin/role/opt',
+                data: f,
+                success: function (d) {
+                    console.log(d);
+                    parent.layui.table.reload('trole');
+                    layer.alert(d.message, {icon: d.code + 1}, function () {
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                }
+            });
+            return false;
+        });
+
+        form.on('checkbox(father)', function (data) {
+            if (data.elem.checked) {
+                $(data.elem).parent().siblings('td').find('input').prop("checked", true);
+                form.render();
+            } else {
+                $(data.elem).parent().siblings('td').find('input').prop("checked", false);
+                form.render();
+            }
+        });
+    });
+</script>
+</body>
+</html>

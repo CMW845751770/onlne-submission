@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    <form class="layui-form" id="userForm">
+        <div class="layui-form-item">
+            <label for="username" class="layui-form-label">
+                <span class="x-red">*</span>用户名
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="username" name="username" required="" lay-verify="username"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span id="nametip">将会成为您唯一的登录名</span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="realname" class="layui-form-label">
+                <span class="x-red">*</span>昵称
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="realname" name="realname" required="" lay-verify="11realname"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="email" class="layui-form-label">
+                <span class="x-red">*</span>邮箱
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="email" name="email" required="" lay-verify="email"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                用于找回密码
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"><span class="x-red">*</span>角色</label>
+            <div class="layui-input-block">
+                <input type="checkbox" name="rids" lay-skin="primary"
+                       th:each="item,property : ${roles}" th:title="${item.name}" th:value="${item.id}">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="password" class="layui-form-label">
+                <span class="x-red">*</span>密码
+            </label>
+            <div class="layui-input-inline">
+                <input type="password" id="password" name="password" required="" lay-verify="password"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                6到16个字符
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="repass" class="layui-form-label">
+                <span class="x-red">*</span>确认密码
+            </label>
+            <div class="layui-input-inline">
+                <input type="password" id="repass" name="repass" required="" lay-verify="repass"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"/>
+            <button class="layui-btn" lay-submit="" lay-filter="add">增加</button>
+        </div>
+    </form>
+</div>
+<script>
+    layui.use(['form', 'layer'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer;
+        var usernameMsg;
+        //自定义验证规则
+        form.verify({
+            username: function (value) {
+                console.log(value);
+                if (value.length < 5) {
+                    return '用户名至少得5个字符';
+                } else {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/admin/user/opt',
+                        data: {username: value},
+                        success: function (d) {
+                            usernameMsg = d;
+                            console.log(d);
+                            $("#nametip").val(usernameMsg.message);
+                            if (d.code == 1) {
+                                return d.message;
+                            }
+                        }
+                    });
+                }
+            }
+            , realname: function (value) {
+                if (value.length < 5) {
+                    return '昵称至少得5个字符';
+                }
+            }
+            , password: [/(.+){6,12}$/, '密码必须6到12位']
+            , repass: function (value) {
+                if ($('#password').val() != $('#repass').val()) {
+                    return '两次密码不一致';
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(add)', function (data) {
+            var f = $('#userForm').serializeObject();
+            console.log(f);
+            // 异步提交表单
+            $.ajax({
+                type: 'POST',
+                url: '/admin/user/opt',
+                data: f,
+                success: function (d) {
+                    console.log(d);
+                    parent.layui.table.reload('tuser');
+                    layer.alert(d.message, {icon: d.code + 1}, function () {
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                }
+            });
+            return false;
+        });
+    });
+
+    //用户名输入框失焦事件
+    $("#username").blur(function(){
+        var value = $("#username").val();
+        if (value.length < 5) {
+            layer.msg('用户名至少得5个字符',{icon: 5,time:1000});
+            return false;
+        }
+        $.ajax({
+            type: 'GET',
+            url: '/admin/user/opt',
+            data: {username: value },
+            success: function (d) {
+                usernameMsg = d;
+                $("#nametip").text(d.message);
+                if (d.code == 1) {
+                    $("#nametip").css("color", "red");
+                } else if(d.code == 0){
+                    $("#nametip").css("color", "green");
+                }
+            }
+        });
+    });
+
+
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if(this.name=="rids"){
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = [this.value || ''];
+                }
+            }else if (o[this.name] !== undefined) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>
+</body>
+</html>

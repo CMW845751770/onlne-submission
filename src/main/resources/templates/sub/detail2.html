@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+        <div class="layui-form-item">
+            <label for="author" class="layui-form-label">
+                <span class="x-red">*</span>作者
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="author" name="author" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input" th:value="${sub.author}" readonly style="border-style:none">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="title" class="layui-form-label">
+                <span class="x-red">*</span>标题
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="title" name="title" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input" th:value="${sub.title}" readonly style="border-style:none">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="titleEn" class="layui-form-label">
+                <span class="x-red">*</span>标题(英文)
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="titleEn" name="titleEn" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input" th:value="${sub.titleEn}" readonly style="border-style:none">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="summary" class="layui-form-label">
+                <span class="x-red">*</span>摘要
+            </label>
+            <div class="layui-input-block">
+                <textarea id="summary" name="summary" required="" lay-verify="required"
+                          autocomplete="off" class="layui-textarea" readonly style="border-style:none">[[${sub.summary}]]</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="summaryEn" class="layui-form-label">
+                <span class="x-red">*</span>摘要(英文)
+            </label>
+            <div class="layui-input-block">
+                <textarea id="summaryEn" name="summaryEn" required="" lay-verify="required"
+                          autocomplete="off" class="layui-textarea" readonly style="border-style:none">[[${sub.summaryEn}]]</textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="keyword" class="layui-form-label">
+                <span class="x-red">*</span>关键词
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="keyword" name="keyword" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input" th:value="${sub.keyword}" readonly style="border-style:none"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="keywordEn" class="layui-form-label">
+                <span class="x-red">*</span>关键词(英文)
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="keywordEn" name="keywordEn" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input" th:value="${sub.keywordEn}" readonly style="border-style:none"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="subject" class="layui-form-label">
+                <span class="x-red">*</span>学科
+            </label>
+            <div class="layui-input-inline">
+                <select lay-verify="" id="subject" name="subject" disabled="disabled" style="border-style:none">
+                    <option value="0" th:selected="${sub.subject==0}">计算机科学与技术</option>
+                    <option value="1" th:selected="${sub.subject==1}">机电工程</option>
+                    <option value="2" th:selected="${sub.subject==2}">物理工程</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-upload">
+<!--                <button type="button" class="layui-btn layui-btn-normal" id="testList">选择多文件</button>-->
+                <div class="layui-upload-list">
+                    <table class="layui-table">
+                        <thead>
+                        <tr>
+                            <th>文件名</th>
+                            <th>大小</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="demoList">
+                            <tr th:each="file,property : ${files}">
+                                <td>[[${file.filename}]]
+                                    <input type="hidden" name="fid" th:value="${file.id}">
+                                </td>
+                                <td>[[${file.filesize}]].byte</td>
+                                <td><span style="color: #5FB878;">已上传</span></td>
+                                <td>
+                                    <a class="layui-btn layui-btn-xs demo-down" target="_blank" th:href="'localhost:8765/toPdfFile/'+${file.id}">预览</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+</div>
+</body>
+</html>

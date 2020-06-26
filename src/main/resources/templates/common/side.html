@@ -1,0 +1,77 @@
+<!-- 左侧菜单开始 -->
+<div class="left-nav">
+    <div id="side-nav">
+        <ul id="nav">
+        </ul>
+    </div>
+</div>
+<!-- <div class="x-slide_left"></div> -->
+<!-- 左侧菜单结束 -->
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.ajax({
+            type: "GET",
+            url: "/admin/permission/listself",
+            success: function (data) {
+                var nav = $("#nav");
+                var sub;
+                $.each(data, function (i, v) {
+                    if (v.pid == "0") {
+                        sub = createli(v, data);
+                        nav.append(sub);
+                    }
+                });
+            },
+            dataType: "json"
+        });
+    });
+
+    function createli(v, data) {
+        let subli = "";
+        let sm = "";
+        if (v.pid == "0") {
+            subli = "<li>\n" +
+                "    <a href='javascript:;'>\n" +
+                "        <i class='fa " + v.icon + " fa-lg'></i>\n" +
+                "        <cite>" + v.name + "</cite>\n" +
+                "        <i class='iconfont nav_right'>&#xe697;</i>\n" +
+                "    </a>\n";
+            //拼接子节点
+            sm = submenu(v.id, data);
+            subli += sm == undefined ? "" : sm;
+            subli += "</li>";
+            return subli;
+        } else {
+            return "";
+        }
+    }
+
+    function submenu(id, data) {
+        let subm = "";
+        let sm = "";
+        for (let v of data) {
+            if (v.pid != "0" && v.pid == id) {
+                subm += "<ul class='sub-menu'>\n";
+                let u = "<i class='iconfont'>&#xe6a7;</i>\n";
+                if (v.icon != "") {
+                    u = "<i class='fa " + v.icon + " fa-lg'></i>\n";
+                }
+                subm += "    <li date-refresh='1'>\n" +
+                    "        <a _href='" + v.url + "'>\n" +
+                    u +
+                    "            <cite>" + v.name + "</cite>\n";
+                if(v.count!=null){
+                    subm+="<span class=\"layui-badge\">"+v.count+"</span>";
+                }
+                subm+=    "        </a>\n";
+                //拼接子节点
+                sm = submenu(v.id, data);
+                subm += sm == undefined ? "" : sm;
+                subm += "    </li>\n";
+                subm += "</ul>";
+            }
+        }
+        return subm;
+    }
+
+</script>

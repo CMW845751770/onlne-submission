@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    <form class="layui-form" id="userForm" action="" method="post">
+        <div class="layui-form-item">
+            <label for="realname" class="layui-form-label">
+                <span class="x-red">*</span>姓名
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="realname" name="realname" required="" lay-verify="realname"
+                       autocomplete="off" class="layui-input" th:value="${user.realname != null ? user.realname : ''}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span id="nametip">您的姓名</span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="sex" class="layui-form-label">
+                <span class="x-red">*</span>性别
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="sex" name="sex" required="" lay-verify="sex"
+                       autocomplete="off" class="layui-input" th:value="${user.sex != null ? user.sex : ''}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span id="sextip">您的性别1为男性，0为女性</span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="phone" class="layui-form-label">
+                <span class="x-red">*</span>电话号码
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="phone" name="phone" required="" lay-verify="phone"
+                       autocomplete="off" class="layui-input" th:value="${user.phone != null ? user.phone : ''}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span id="phonetip">您的电话号码</span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="graduationSchool" class="layui-form-label">
+                <span class="x-red">*</span>毕业学校
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="graduationSchool" name="graduationSchool" required="" lay-verify="graduationSchool"
+                       autocomplete="off" class="layui-input" th:value="${user.graduationSchool != null ? user.graduationSchool : ''}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span id="graduationSchooltip">您的毕业学校</span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="education" class="layui-form-label">
+                <span class="x-red">*</span>学历
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="education" name="education" required="" lay-verify="education"
+                       autocomplete="off" class="layui-input" th:value="${user.education != null ? user.education : ''}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span id="educationtip">您的学历</span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="degree" class="layui-form-label">
+                <span class="x-red">*</span>学位
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="degree" name="degree" required="" lay-verify="degree"
+                       autocomplete="off" class="layui-input" th:value="${user.degree != null? user.degree : ''}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span id="degreetip">您的学位</span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="address" class="layui-form-label">
+                <span class="x-red">*</span>通信地址
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="address" name="address" required="" lay-verify="address"
+                       autocomplete="off" class="layui-input" th:value="${user.address != null ? user.address : ''}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span id="addresstip">您的通信地址</span>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="zipcode" class="layui-form-label">
+                <span class="x-red">*</span>邮编
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="zipcode" name="zipcode" required="" lay-verify="zipcode"
+                       autocomplete="off" class="layui-input" th:value="${user.zipcode != null? user.zipcode : ''}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                <span id="zipcodetip">您的邮编</span>
+            </div>
+        </div>
+        <!--<div class="layui-form-item">
+            <label for="email" class="layui-form-label">
+                <span class="x-red">*</span>邮箱
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="email" name="email" required="" lay-verify="email"
+                       autocomplete="off" class="layui-input" th:value="${user.email}">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                用于找回密码
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"><span class="x-red">*</span>角色</label>
+            <div class="layui-input-block">
+                <th:block th:each="item,property : ${roles}">
+                    <input type="checkbox" name="rids" lay-skin="primary"
+                           th:title="${item.name}" th:value="${item.id}"
+                           th:checked="${user._rids.get(item.id)}">
+                </th:block>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="password" class="layui-form-label">
+                <span class="x-red">*</span>密码
+            </label>
+            <div class="layui-input-inline">
+                <input type="password" id="password" name="password" required="false" lay-verify="password"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                6到16个字符
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="repass" class="layui-form-label">
+                <span class="x-red">*</span>确认密码
+            </label>
+            <div class="layui-input-inline">
+                <input type="password" id="repass" name="repass" lay-verify="repass"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>-->
+        <div class="layui-form-item">
+            <label class="layui-form-label"/>
+            <button class="layui-btn" lay-submit="" lay-filter="edit" type="submit">修改</button>
+        </div>
+        <input type="hidden" name="_method" value="put"/>
+        <input type="hidden" id="namebak" th:value="${user.username}"/>
+        <input type="hidden" name="id" th:value="${user.id}"/>
+    </form>
+</div>
+<script>
+    layui.use(['form', 'layer'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer;
+        var usernameMsg;
+        //自定义验证规则
+        form.verify({
+            realname: function (value) {
+                if (value.length == 0) {
+                    return '姓名不能为空';
+                }
+            }
+            , sex: function (value) {
+                if (value.length == 0 ||(value != 0 && value != 1)) {
+                    return '请输入0、1表示性别';
+                }
+            }
+            , phone: function (value) {
+                if (value.length == 0 ||value.length != 11) {
+                    return '请输入正确的手机号码';
+                }
+            }
+            , email: function (value) {
+                if (value.length == 0) {
+                    return '邮箱不能为空';
+                }
+            }
+            , graduationSchool: function (value) {
+                if (value.length == 0) {
+                    return '毕业学校不能为空';
+                }
+            }
+            , education: function (value) {
+                if (value.length == 0 ) {
+                    return '学历不能为空';
+                }
+            }
+            , degree: function (value) {
+                if (value.length == 0 ) {
+                    return '学位不能为空';
+                }
+            }
+            , address: function (value) {
+                if (value.length == 0) {
+                    return '通信地址不能为空';
+                }
+            }
+            , zipcode: function (value) {
+                if (value.length == 0) {
+                    return '邮编不能为空';
+                }
+            }
+        });
+
+        //监听提交
+        form.on('submit(edit)', function (data) {
+            var obj = data.field;
+            var f = $('#userForm').serializeObject();
+            console.log(f);
+            console.log(usernameMsg);
+            // 异步提交表单
+            $.ajax({
+                type: 'PUT',
+                url: '/admin/userdata/opt/'+obj.id,
+                data: f,
+                success: function (d) {
+                    console.log(d);
+                    // parent.layui.table.reload('tuser');
+                    layer.alert(d.message, {icon: d.code + 1}, function () {
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                }
+            });
+            return false;
+        });
+    });
+
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if(this.name=="rids"){
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = [this.value || ''];
+                }
+            }else if (o[this.name] !== undefined) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+</script>
+</body>
+</html>

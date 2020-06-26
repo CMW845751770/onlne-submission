@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>欢迎页面</title>
+
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    <form action="" method="post" class="layui-form layui-form-pane" id="putForm">
+        <div class="layui-form-item">
+            <label for="author" class="layui-form-label">
+                <span class="x-red">*</span>作者
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="author" name="author" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="title" class="layui-form-label">
+                <span class="x-red">*</span>标题
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="title" name="title" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="titleEn" class="layui-form-label">
+                <span class="x-red">*</span>标题(英文)
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="titleEn" name="titleEn" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="summary" class="layui-form-label">
+                <span class="x-red">*</span>摘要
+            </label>
+            <div class="layui-input-block">
+                <textarea id="summary" name="summary" required="" lay-verify="required"
+                          autocomplete="off" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="summaryEn" class="layui-form-label">
+                <span class="x-red">*</span>摘要(英文)
+            </label>
+            <div class="layui-input-block">
+                <textarea id="summaryEn" name="summaryEn" required="" lay-verify="required"
+                          autocomplete="off" class="layui-textarea"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="keyword" class="layui-form-label">
+                <span class="x-red">*</span>关键词
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="keyword" name="keyword" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="keywordEn" class="layui-form-label">
+                <span class="x-red">*</span>关键词(英文)
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="keywordEn" name="keywordEn" required="" lay-verify="required"
+                       autocomplete="off" class="layui-input"/>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="subject" class="layui-form-label">
+                <span class="x-red">*</span>学科
+            </label>
+            <div class="layui-input-inline">
+                <select lay-verify="" id="subject" name="subject">
+                    <option value="0">计算机科学与技术</option>
+                    <option value="1">机电工程</option>
+                    <option value="2">物理工程</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <div class="layui-upload">
+                <button type="button" class="layui-btn layui-btn-normal" id="testList">选择多文件</button>
+                <div class="layui-upload-list">
+                    <table class="layui-table">
+                        <thead>
+                        <tr>
+                            <th>文件名</th>
+                            <th>大小</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody id="demoList"></tbody>
+                    </table>
+                </div>
+                <button type="button" class="layui-btn" id="testListAction">开始上传</button>
+            </div>
+        </div>
+        <br/>
+        <div class="layui-form-item">
+            <button class="layui-btn" lay-submit="" lay-filter="add">增加</button>
+        </div>
+    </form>
+</div>
+<script>
+    layui.use('upload', function () {
+        var $ = layui.jquery
+            , upload = layui.upload;
+        //多文件列表示例
+        var demoListView = $('#demoList')
+            , uploadListIns = upload.render({
+            elem: '#testList'
+            , url: '/admin/file/upload'
+            , accept: 'file'//允许上传的文件类型
+            , size: 51200 //最大允许上传的文件大小
+            , multiple: true
+            , auto: false
+            , bindAction: '#testListAction'
+            , exts:'doc|docx|jpg|pdf'
+            , choose: function (obj) {
+                var files = this.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+                //读取本地文件
+                obj.preview(function (index, file, result) {
+                    var tr = $(['<tr id="upload-' + index + '">'
+                        , '<td>' + file.name +
+                        '<input type="hidden" name="fids" id="' + index + '"/>'
+                        ,'</td>'
+                        , '<td>' + (file.size / 1014).toFixed(1) + 'kb</td>'
+                        , '<td>等待上传</td>'
+                        , '<td>'
+                        , '<button class="layui-btn layui-btn-xs demo-reload layui-hide">重传</button>'
+                        , '<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'
+                        , '</td>'
+                        , '</tr>'].join(''));
+
+                    //单个重传
+                    tr.find('.demo-reload').on('click', function () {
+                        obj.upload(index, file);
+                    });
+
+                    //删除
+                    tr.find('.demo-delete').on('click', function () {
+                        delete files[index]; //删除对应的文件
+                        tr.remove();
+                        uploadListIns.config.elem.next()[0].value = ''; //清空 input file 值，以免删除后出现同名文件不可选
+                    });
+
+                    demoListView.append(tr);
+                });
+            }
+            , done: function (res, index, upload) {
+                if (res.code == 0) { //上传成功
+                    var tr = demoListView.find('tr#upload-' + index)
+                        , tds = tr.children();
+                    tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
+
+                    $("#"+index).val(res.data);
+                    // return delete this.files[index]; //删除文件队列已经上传成功的文件
+                }else{
+                    this.error(index, upload);
+                }
+            }
+            , error: function (index, upload) {
+                var tr = demoListView.find('tr#upload-' + index)
+                    , tds = tr.children();
+                tds.eq(2).html('<span style="color: #FF5722;">上传失败</span>');
+                tds.eq(3).find('.demo-reload').removeClass('layui-hide'); //显示重传
+            }
+        });
+    });
+</script>
+<script>
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if(this.name=="fids"){
+                if (o[this.name] !== undefined) {
+                    if (!o[this.name].push) {
+                        o[this.name] = [o[this.name]];
+                    }
+                    o[this.name].push(this.value || '');
+                } else {
+                    o[this.name] = [this.value || ''];
+                }
+            }else if (o[this.name] !== undefined) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+    layui.use(['form', 'layer'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer;
+        //监听提交
+        form.on('submit(add)', function (data) {
+            var obj = data.field;
+            var f = $('#putForm').serializeObject();
+            console.log(f);
+            console.log(obj);
+            // 异步提交表单
+            $.ajax({
+                type: 'POST',
+                url: '/admin/sub/put',
+                data: f,
+                success: function (d) {
+                    console.log(d);
+                    layer.msg(d.message);
+                    self.location.reload();
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+</html>

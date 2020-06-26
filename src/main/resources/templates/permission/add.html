@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <title>添加页面</title>
+    <div th:replace="common/css"/>
+    <div th:replace="common/js"/>
+
+    <!-- 让IE8/9支持媒体查询，从而兼容栅格 -->
+    <!--[if lt IE 9]>
+    <script src="https://cdn.staticfile.org/html5shiv/r29/html5.min.js"></script>
+    <script src="https://cdn.staticfile.org/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+<div class="x-body">
+    <form class="layui-form">
+        <div class="layui-form-item">
+            <label for="name" class="layui-form-label">
+                <span class="x-red">*</span>权限名
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="name" name="name"
+                       autocomplete="off" class="layui-input" lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="pid" class="layui-form-label">
+                <span class="x-red">*</span>上级权限
+            </label>
+            <div class="layui-input-inline">
+                <select lay-verify="" id="pid" name="pid" lay-search>
+                    <option value="0">默认(无)</option>
+                    <option th:each="item,property : ${pers}" th:value="${item.id}">[[${item.name}]]</option>
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="type" class="layui-form-label">
+                <span class="x-red">*</span>类型
+            </label>
+            <div class="layui-input-inline">
+                <select lay-verify="" id="type" name="type">
+                    <option value="0">目录</option>
+                    <option value="1">菜单</option>
+                    <option value="2">按钮</option>
+                    <option value="3">接口</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label for="url" class="layui-form-label"><span class="x-red">*</span>地址</label>
+            <div class="layui-input-inline">
+                <input type="text" id="url" name="url"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                示例：/admin/user
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="permCode" class="layui-form-label"><span class="x-red">*</span>权限编码</label>
+            <div class="layui-input-inline">
+                <input type="text" id="permCode" name="permCode"
+                       autocomplete="off" class="layui-input" lay-verify="required">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="icon" class="layui-form-label">
+                <span class="x-red">*</span>图标
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="icon" name="icon"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word">
+                参考：<a target="_blank" href="https://www.thinkcmf.com/font/font_awesome/icons.html">Font Awesome</a>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="seq" class="layui-form-label">
+                <span class="x-red">*</span>顺序
+            </label>
+            <div class="layui-input-inline">
+                <input type="text" id="seq" name="seq"
+                       autocomplete="off" class="layui-input">
+            </div>
+            <div class="layui-form-mid layui-word-aux">
+                用于排序，数字越小优先级别越高
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label for="description" class="layui-form-label">
+                <span class="x-red">*</span>描述
+            </label>
+            <div class="layui-input-block">
+                <textarea id="description" name="description" class="layui-textarea"
+                          placeholder="请输入描述内容"></textarea>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">
+            </label>
+            <button class="layui-btn" lay-filter="add" lay-submit="" type="submit">
+                增加
+            </button>
+        </div>
+    </form>
+</div>
+<script>
+    layui.use(['form', 'layer'], function () {
+        $ = layui.jquery;
+        var form = layui.form
+            , layer = layui.layer;
+
+        //监听提交
+        form.on('submit(add)', function (data) {
+            var obj = data.field;
+            console.log(obj);
+            // 异步提交表单
+            $.ajax({
+                type: 'POST',
+                url: '/admin/permission/opt',
+                data: obj,
+                success: function (d) {
+                    console.log(d);
+                    parent.layui.table.reload('test');
+                    layer.alert(d.message, {icon: d.code + 1}, function () {
+                        // 获得frame索引
+                        var index = parent.layer.getFrameIndex(window.name);
+                        //关闭当前frame
+                        parent.layer.close(index);
+                    });
+                }
+            });
+            return false;
+        });
+    });
+</script>
+</body>
+
+</html>

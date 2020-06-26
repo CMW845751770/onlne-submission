@@ -1,0 +1,48 @@
+spring:
+  datasource:
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/publication_manager?serverTimezone=UTC&useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+    type: com.alibaba.druid.pool.DruidDataSource
+    initialSize: 5
+    minIdle: 5
+    maxActive: 20
+    maxWait: 60000
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 300000
+    validationQuery: SELECT 1 FROM DUAL
+    testWhileIdle: true
+    testOnBorrow: false
+    testOnReturn: false
+    poolPreparedStatements: true
+    filters: stat,wall,slf4j,config
+    maxPoolPreparedStatementPerConnectionSize: 20
+    useGlobalDataSourceStat: true
+    connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+  redis:
+    port: 6379
+    host: localhost
+security:
+  ignoring: "/static/**/*, /druid/**/*, /login, /webjars/**/*, /images/**/*, /css/**/*, /fonts/**/*, /images/**/*, /js/**/*, /lib/**/*,/index,/index.html,/,/register,/register.html,/admin/user/opt,/admin/sub/list,/admin/sub/detail2/*,/admin/file/down2/*,/notice,/notice.html"
+  intercept: "/**/*"
+  successUrl: "/admin"
+  logoutSuccessUrl: "/login"
+mybatis-plus:
+  typeAliasesPackage: cn.edu.tju.entity
+  mapper-locations: classpath*:/mapper/*.xml
+  global-config:
+    id-type: 0
+    table-prefix: pm_
+    field-strategy: 2
+    refresh-mapper: true # 调试
+    db-column-underline: true
+    logic-delete-value: 1
+    logic-not-delete-value: 0
+  configuration:
+    map-underscore-to-camel-case: true
+    cache-enabled: false #开启二级缓存，TOOD:开启后出现不更新缓存问题
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+file:
+  upload:
+    src: d:/test/

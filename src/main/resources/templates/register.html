@@ -1,0 +1,77 @@
+<!doctype html>
+<html  class="x-admin-sm" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<meta charset="UTF-8">
+	<title>会员注册</title>
+	<meta name="renderer" content="webkit|ie-comp|ie-stand">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width,user-scalable=yes, minimum-scale=0.4, initial-scale=0.8,target-densitydpi=low-dpi" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+
+    <div th:replace="common/css"></div>
+    <div th:replace="common/js"></div>
+
+</head>
+<body class="login-bg">
+    
+    <div class="login layui-anim layui-anim-up">
+        <div class="message">会员注册</div>
+        <div id="darkbannerwrap"></div>
+        
+        <form method="get" id = "registerForm" class="layui-form" th:action="@{/login}">
+            <input id = "username" name="username" placeholder="用户名"  type="text" lay-verify="required" class="layui-input" >
+            <hr class="hr15">
+            <input id = "password" name="password" lay-verify="required" placeholder="密码"  type="password" class="layui-input">
+            <hr class="hr15">
+            <input id="password2" name="password2" lay-verify="required" placeholder="确认密码"  type="password" class="layui-input">
+            <hr class="hr15">
+            <input value="注册" lay-submit lay-filter="login" style="width:100%;" type="submit">
+            <hr class="hr20" >
+        </form>
+    </div>
+
+    <script>
+        $(function  () {
+            $("#registerForm").submit(function () {
+                if($("#username").val().length < 5){
+                    layer.msg("昵称至少得5个字符") ;
+                    return false;
+                }
+                if($("#password").val().length <6 || $("#password").val().length > 12){
+                    layer.msg("密码必须6到12位") ;
+                    return false;
+                }
+                if($("#password2").val() != $("#password").val()){
+                    layer.msg("两次密码不一致") ;
+                    return false;
+                }
+                var flag = false ;
+                $.ajaxSettings.async = false;
+                $.ajax({
+                    type: 'POST',
+                    url: '/admin/user/opt',
+                    data: {
+                        "username":$("#username").val() ,
+                        "password":$("#password").val() ,
+                        "rids[]":3
+                    },
+                    success: function (d) {
+                        if(d.code === 0){
+                            layer.msg("注册成功") ;
+                        }else{
+                            layer.msg("注册失败") ;
+                            flag = true ;
+                        }
+                    }
+                });
+                $.ajaxSettings.async = true;
+                if (flag) {
+                    return false;
+                }
+                window.location.href = "/login" ;
+                return false ;
+            })
+        })
+    </script>
+</body>
+</html>
